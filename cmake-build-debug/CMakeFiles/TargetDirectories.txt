@@ -1,0 +1,3 @@
+/home/mattia/Documenti/Progetto_Calcolatori/Scheduler2018/Progetto2018/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/mattia/Documenti/Progetto_Calcolatori/Scheduler2018/Progetto2018/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/mattia/Documenti/Progetto_Calcolatori/Scheduler2018/Progetto2018/cmake-build-debug/CMakeFiles/Progetto2018.dir
