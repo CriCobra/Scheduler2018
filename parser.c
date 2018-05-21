@@ -47,13 +47,16 @@ int parse (char *file_input, Task **tasks, Istruzione **instructions) {
             case 't':
                 if (n_task!= 0) {
                     task[n_task-1].instr_list =  &istruzione[n_instr-task[n_task-1].n_istruzioni];
+                    task[n_task-1].pc = task[n_task-1].instr_list;
                 }
                 fscanf(i_file, ",%d,%d", &task[n_task].id, &task[n_task].arrival_time);
                 task[n_task].stato = NEW;
+                task[n_task].ended = 0;
                 n_task++;
                 break;
             case 'i': fscanf(i_file, ",%d,%d", &istruzione[n_instr].type_flag, &istruzione[n_instr].length);
                 task[n_task-1].n_istruzioni++;
+                task[n_task-1].task_length += istruzione->length;
                 n_instr++;
                 break;
             default:;

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include "strutture_dati.h"
+#include "scheduler.h"
 
 
 
@@ -17,12 +18,12 @@ int main(int argc, char *argv[]) {
     Task *tasks = NULL;
     Istruzione *instructions = NULL;
     //  parametri(argc, argv);
-    parse("/Users/CriCobra/Documents/Università/Calcolatori/Progetto2018/01_tasks.csv", &tasks, &instructions);
+    int n_task = parse("/Users/CriCobra/Documents/Università/Calcolatori/Progetto2018/01_tasks.csv", &tasks, &instructions);
 
 
 
     //The pid_t data type represents process IDs
-    /*   pid_t scheduler_preemptive, scheduler_notpreemptive;
+       pid_t scheduler_preemptive, scheduler_notpreemptive;
 
        if ((scheduler_preemptive = fork()) != 0) {
            if ((scheduler_notpreemptive = fork()) != 0) {
@@ -43,8 +44,9 @@ int main(int argc, char *argv[]) {
 
 
        } else  {
-           //sono nel preemptive
 
+           //sono nel preemptive
+            sort_task(&tasks, n_task);
 
 
 
@@ -59,12 +61,12 @@ int main(int argc, char *argv[]) {
 
 
 
-   }  */
+
     return 0;
 }
 
 
-/*void print_help(FILE* stream, int exit_code)
+void print_help(FILE* stream, int exit_code)
 {
     fprintf(stream, "Help options\n");
     fprintf(stream,
@@ -170,7 +172,7 @@ void parametri (int argc, char* const argv[]) {
 
 }
 
-*/
+
 
 
 

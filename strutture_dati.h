@@ -3,6 +3,8 @@
 #ifndef PROGETTO2018_STRUTTURE_DATI_H
 #define PROGETTO2018_STRUTTURE_DATI_H
 
+#include <stdlib.h>
+#include <stdio.h>
 
 //Possibili stati di un processo
 typedef enum {NEW, READY, RUNNING, BLOCKED, EXIT} STATE;
@@ -15,19 +17,24 @@ typedef struct Istruzione {
 typedef struct Task {
     int id;
     Istruzione *pc;
-    int arrival_time;
+    long int arrival_time;
     Istruzione *instr_list;
     int n_istruzioni;
+    int task_length;
     STATE stato;
+    int ended;
 }Task;
 
-typedef  struct Parametri{
+
+
+typedef  struct Parametri {
     int n_core;
-    int n_job;
-    int job_rimanenti;
-    char* file_out;
+    char *output;
+    int n_task;
+    int queue;
     Task** tasks;
-    Istruzione** istruzioni;
+    Istruzione** instrunctions;
+    char type;
 }Parametri;
 
 

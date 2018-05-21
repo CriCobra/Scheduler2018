@@ -3,4 +3,4 @@ project(Progetto2018 C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(Progetto2018 main.c strutture_dati.h parser.c scheduler.c)
+add_executable(Progetto2018 main.c strutture_dati.h parser.c scheduler.c scheduler.h core.h core.c)
