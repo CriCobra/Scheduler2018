@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
-#include "strutture_dati.h"
 #include "scheduler.h"
-#include "core.h"
 
 FILE *o_file;
 
@@ -25,8 +20,8 @@ void start_sched(Task *tasks, Istruzione *instructions, int n_task, char *f_outp
     pthread_t core_1;
 
     //creo struct Parametri per i due core (thread)
-    struct Parametri p_0 = NULL;
-    struct Parametri p_1 = NULL;
+    struct Parametri p_0;
+    struct Parametri p_1;
 
 
    //riempio con i parametri e faccio partire i due core
@@ -80,36 +75,6 @@ void fill_param(Parametri *p, int n_core, char *f_output, int n_task, Task** tas
     p->tasks = task;
     p->instrunctions = instrunction;
     p->type = type;
-}
-
-
-void sort_task(Task** task, int n_task) {
-    Task *tasks = task[0];
-    Task temp;
-    int posizione = 0;
-    for (int i=0; i< n_task; i++) {
-        for (int j = i + 1; j<n_task; j++) {
-            if (tasks[j].task_length < tasks[posizione].task_length)
-                posizione = j;
-
-            }
-                switch_task(&tasks[i], &temp);
-                switch_task(&tasks[posizione], &tasks[i]);
-                switch_task(&temp, &tasks[posizione]);
-        }
-
-}
-
-
-void switch_task(Task* task1, Task* task2) {
-    task1->task_length = task2->task_length;
-    task1->instr_list = task2->instr_list;
-    task1->n_istruzioni = task2->n_istruzioni;
-    task1->arrival_time = task2->arrival_time;
-    task1->id = task2->id;
-    task1->pc = task2->pc;
-    task1->stato = task2->stato;
-
 }
 
 

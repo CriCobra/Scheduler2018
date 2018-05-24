@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sysexits.h>
-#include <stdlib.h>
 #include <getopt.h>
 #include "strutture_dati.h"
 #include "scheduler.h"
@@ -14,11 +9,13 @@ char *outputNoPreemption;
 char *input;
 const char* program_name;
 
+
+
 int main(int argc, char *argv[]) {
     Task *tasks = NULL;
     Istruzione *instructions = NULL;
-    //  parametri(argc, argv);
-    int n_task = parse("/Users/CriCobra/Documents/Università/Calcolatori/Progetto2018/01_tasks.csv", &tasks, &instructions);
+     parametri(argc, argv);
+    int n_task = parse(input, &tasks, &instructions);
 
 
 
@@ -36,7 +33,7 @@ int main(int argc, char *argv[]) {
 
            } else  {
                //sono nel not preemptive
-
+               start_sched(tasks, instructions, n_task, outputNoPreemption, 'N');
 
 
 
@@ -46,9 +43,9 @@ int main(int argc, char *argv[]) {
        } else  {
 
            //sono nel preemptive
-            sort_task(&tasks, n_task);
 
 
+           start_sched(tasks, instructions, n_task, outputPreemption, 'P');
 
 
 
@@ -73,7 +70,7 @@ void print_help(FILE* stream, int exit_code)
             " -op   --output-preemption: il file di output con i risultati dello scheduler con preemption.\n"
                     " -on   --output-no-preemption: il file di output con i risultati dello scheduler senza preemption.\n"
                     " -i    --input: il file di input contenente la lista dei job.\n"
-                    " -h --help             Display this help information.\n");
+                    " -h    --help             Display this help information.\n");
     exit(exit_code);
 }
 
@@ -121,12 +118,12 @@ void parametri (int argc, char* const argv[]) {
             case 'o':
                 if (optarg[0] == 'p')
                 {
-                    *outputPreemption = &optarg[2];
+                    outputPreemption = &optarg[2];
                 }
 
                 else if (optarg[0] == 'n')
                 {
-                    *outputNoPreemption = &optarg[2];
+                    outputNoPreemption = &optarg[2];
                 }
                 else
                 {
@@ -137,9 +134,9 @@ void parametri (int argc, char* const argv[]) {
 
 
             case 'i':
-                *input = optarg;
+                input = optarg;
 
-                if(access(*input, F_OK) != -1 )
+                if(access(input, F_OK) != -1 )
                 {
                     //Il file di input inserito è valido
                 }

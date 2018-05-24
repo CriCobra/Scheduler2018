@@ -1,7 +1,4 @@
 #include "strutture_dati.h"
-#include <mm_malloc.h>
-#include <stdio.h>
-
 
 int parse (char *file_input, Task **tasks, Istruzione **instructions) {
     FILE *i_file;
@@ -9,7 +6,7 @@ int parse (char *file_input, Task **tasks, Istruzione **instructions) {
 
    if (i_file == NULL) {
         printf ("Impossibile aprire il file \n");
-        return NULL;
+        return 0;
     }
 
     int n_instr = 0;
@@ -49,7 +46,7 @@ int parse (char *file_input, Task **tasks, Istruzione **instructions) {
                     task[n_task-1].instr_list =  &istruzione[n_instr-task[n_task-1].n_istruzioni];
                     task[n_task-1].pc = task[n_task-1].instr_list;
                 }
-                fscanf(i_file, ",%d,%d", &task[n_task].id, &task[n_task].arrival_time);
+                fscanf(i_file, ",%d,%l", &task[n_task].id, &task[n_task].arrival_time);
                 task[n_task].stato = NEW;
                 task[n_task].ended = 0;
                 n_task++;
@@ -71,8 +68,6 @@ int parse (char *file_input, Task **tasks, Istruzione **instructions) {
 
     *tasks = task;
     *instructions = istruzione;
-
-
     return n_task-1;
 
 }

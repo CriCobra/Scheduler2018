@@ -39,5 +39,7 @@ typedef  struct Parametri {
 
 
 int parse (char *file_input, Task **tasks, Istruzione **instructions);
+void print_help(FILE* stream, int exit_code);
+void parametri (int argc, char* const argv[]);
 
 #endif //PROGETTO2018_STRUTTURE_DATI_H
