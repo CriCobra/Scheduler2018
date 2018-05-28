@@ -23,10 +23,12 @@ void start_sched(Task *tasks, Istruzione *instructions, int n_task, char *f_outp
     struct Parametri p_0;
     struct Parametri p_1;
 
+    int queue = n_task;
+
 
    //riempio con i parametri e faccio partire i due core
-    fill_param(&p_0,0,f_output,n_task, &task, &instr, type);
-    fill_param(&p_0,1,f_output,n_task, &task, &instr, type);
+    fill_param(&p_0,0,n_task, &queue, &task, type);
+    fill_param(&p_1,1,n_task, &queue, &task, type);
 
 
 
@@ -43,7 +45,7 @@ void start_sched(Task *tasks, Istruzione *instructions, int n_task, char *f_outp
         return;
     }
 
-    if (pthread_create(&core_1, NULL, &start_core, &p_1) != 0) {
+   if (pthread_create(&core_1, NULL, &start_core, &p_1) != 0) {
         printf("Errore creazione core 1\n");
         return;
     }
@@ -67,13 +69,11 @@ void start_sched(Task *tasks, Istruzione *instructions, int n_task, char *f_outp
 
 
 
-void fill_param(Parametri *p, int n_core, char *f_output, int n_task, Task** task, Istruzione** instrunction, char type) {
+void fill_param(Parametri *p, int n_core, int n_task,int *queue, Task** task, char type) {
     p->n_core = n_core;
-    p->output = f_output;
     p->n_task = n_task;
-    p->queue = n_task;
+    p->queue = queue;
     p->tasks = task;
-    p->instrunctions = instrunction;
     p->type = type;
 }
 

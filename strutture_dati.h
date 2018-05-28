@@ -22,18 +22,15 @@ typedef struct Task {
     int n_istruzioni;
     int task_length;
     STATE stato;
-    int ended;
 }Task;
 
 
 
 typedef  struct Parametri {
     int n_core;
-    char *output;
     int n_task;
-    int queue;
+    int *queue;
     Task** tasks;
-    Istruzione** instrunctions;
     char type;
 }Parametri;
 

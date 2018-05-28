@@ -8,6 +8,7 @@ FILE* o_file = NULL;
 
 pthread_mutex_t output_mutex = PTHREAD_MUTEX_INITIALIZER;   //mutex per scrivere su file
 pthread_mutex_t task_mutex = PTHREAD_MUTEX_INITIALIZER;     // mutex per analizzare un task
+pthread_mutex_t sort_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 
@@ -20,58 +21,83 @@ int Casuale(int max) {
 
 //Type N: notpreemptive First Come First Served (FCFS), P:preemptive Shortest Remaining Time First (SRTF)
 void *start_core(void *par) {
-    long int ck = 0;
+    long int clock = 0;
     Parametri *p = (Parametri *) par;
     Task *task = p->tasks[0];
-    while (p->queue != 0) {
+    while (*p->queue > 0) {
         for (int i = 0; i < p->n_task; i++) {
-            if (p->type == 'P')
+            printf("%li\n", task[0].arrival_time);
+
+            if ((i>0) && (task[0].stato == NEW))  //per far arrivare il clock all'arrival time minimo
+                    i--;
+            if ((p->type == 'N') && (i>0) && (task[i-1].stato==READY))
+                i--;
+            if (p->type == 'P') {
+                pthread_mutex_lock(&sort_mutex);
                 sort_task(&task, p->n_task, i);
+
+                pthread_mutex_unlock(&sort_mutex);
+            }
+
+          //  printf("%d\n", i);
             //blocco il mutex e analizzo gli stati
             pthread_mutex_lock(&task_mutex);
             switch (task[i].stato) {
                 case NEW:
-                    if (ck >= task[i].arrival_time) {   //come da specifiche
-                        print_task(p->output, p->n_core, ck, task[i].id, task[i].stato);
+                    if (clock >= task[i].arrival_time) {   //come da specifiche
+                        print_task(p->n_core, clock, task[i].id, task[i].stato);
                         task[i].stato = READY;
-                        print_task(p->output, p->n_core, ck,  task[i].id, task[i].stato);
+                        print_task(p->n_core, clock,  task[i].id, task[i].stato);
                         task[i].stato = RUNNING;
-                        print_task(p->output, p->n_core, ck, task[i].id, task[i].stato);
-                        start_task(&ck, &task[i]);
+                        print_task(p->n_core, clock, task[i].id, task[i].stato);
+                        start_task(&clock, &task[i]);
                         //controllo se il task è finito
                         if (task[i].stato == EXIT) {
-                            p->queue -= 1;  //lo tolgo dalla coda
-                            task[i].ended = 1;  //aggiorno finito
+                            *p->queue -= 1;  //lo tolgo dalla coda
+                            print_task(p->n_core, clock,  task[i].id, task[i].stato);
                         }
-                        print_task(p->output, p->n_core, ck,  task[i].id, task[i].stato);
+                        if (task[i].stato == BLOCKED)
+                            print_task(p->n_core, clock,  task[i].id, task[i].stato);
+                        if (task[i].stato == READY && p->type== 'P')
+                            print_task( p->n_core, clock,  task[i].id, task[i].stato);
+
 
                     }
 
                     break;
                 case READY:
-                    if (ck >= task[i].arrival_time) {
+                    if (clock >= task[i].arrival_time) {
                         task[i].stato = RUNNING;
-                        print_task(p->output, p->n_core, ck, task[i].id, task[i].stato);
-                        start_task(&ck, &task[i]);
+                        if (p->type == 'P')
+                            print_task(p->n_core, clock, task[i].id, task[i].stato);
+                        start_task(&clock, &task[i]);
                         if (task[i].stato == EXIT) {
-                            p->queue -= 1;  //lo tolgo dalla coda
-                            task[i].ended = 1;  //aggiorno finito
+                            *p->queue -= 1;  //lo tolgo dalla coda
+                            print_task( p->n_core, clock,  task[i].id, task[i].stato);
                         }
-                        print_task(p->output, p->n_core, ck, task[i].id, task[i].stato);
+                        if (task[i].stato == BLOCKED)
+                            print_task( p->n_core, clock,  task[i].id, task[i].stato);
+                        if (task[i].stato == READY && p->type== 'P')
+                            print_task( p->n_core, clock,  task[i].id, task[i].stato);
                     }
 
                     break;
 
                 case BLOCKED:
-                    if (ck >= task[i].arrival_time) {
+                    if (clock >= task[i].arrival_time) {
+                        task[i].stato = READY;
+                        print_task( p->n_core, clock,  task[i].id, task[i].stato);
                         task[i].stato = RUNNING;
-                        print_task(p->output, p->n_core, ck, task[i].id, task[i].stato);
-                        start_task(&ck, &task[i]);
+                        print_task( p->n_core, clock, task[i].id, task[i].stato);
+                        start_task(&clock, &task[i]);
                         if (task[i].stato == EXIT) {
-                            p->queue -= 1;  //lo tolgo dalla coda
-                            task[i].ended = 1;  //aggiorno finito
+                            *p->queue -= 1;  //lo tolgo dalla coda
+                            print_task( p->n_core, clock,  task[i].id, task[i].stato);
                         }
-                        print_task(p->output, p->n_core, ck, task[i].id, task[i].stato);
+                        if (task[i].stato == BLOCKED)
+                            print_task( p->n_core, clock,  task[i].id, task[i].stato);
+                        if (task[i].stato == READY && p->type== 'P')
+                            print_task( p->n_core, clock,  task[i].id, task[i].stato);
 
                     }
                     break;
@@ -80,13 +106,13 @@ void *start_core(void *par) {
 
 
             }
+            clock++;
+
             //quando ho finito le operazioni del task sblocco il mutex
             pthread_mutex_unlock(&task_mutex);
-            //se il task non è finito aumento lo stesso il clock
-            if (task[i].ended == 0) {
-                ck++;
-            }
+
         }
+
     }
 
 //distruggo i mutex
@@ -103,7 +129,7 @@ void *start_core(void *par) {
 
 
 
-void print_task(char *output, int n_core,long int ck, int task_id, STATE stato) {
+void print_task(int n_core,long int ck, int task_id, STATE stato) {
     const char *state = NULL;
     switch (stato) {
         case NEW:
@@ -130,7 +156,7 @@ void print_task(char *output, int n_core,long int ck, int task_id, STATE stato) 
 }
 
 
-void start_task (long int *clock, Task* task) {
+void start_task (int long *clock, Task* task) {
     if (task->n_istruzioni != 0) { //se ci sono ancora istruzioni da eseguire
         Istruzione* in = task->pc;
                 if (in->type_flag == 0) {
@@ -138,6 +164,7 @@ void start_task (long int *clock, Task* task) {
                     task->pc = task->instr_list++;
                     task->n_istruzioni--;
                     task->task_length -= in->length;
+                    task->stato = READY;
                 } else if (in->type_flag == 1) {
                     task->stato = BLOCKED;
                     task->arrival_time = Casuale(in->length) + *clock;
@@ -156,19 +183,29 @@ void start_task (long int *clock, Task* task) {
 void sort_task(Task** task, int n_task, int i) {
     Task *tasks = task[0];
     Task temp;
+    temp.task_length = 0;
+    temp.instr_list = 0;
+    temp.n_istruzioni = 0;
+    temp.arrival_time = 0;
+    temp.id = 0;
+    temp.pc = 0;
+    temp.stato = NEW;
+
+
     int posizione = 0;
     int length = tasks[0].task_length;
     for (int j=1; j< n_task; j++) {
-        if ((tasks[j].stato = READY)|| (tasks[j].stato = NEW)) {
+        if ((tasks[j].stato == READY)|| (tasks[j].stato == NEW)) {
             if (tasks[j].task_length < length) {
                 posizione = j;
                 length = tasks[j].task_length;
             }
         }
     }
-        switch_task(&tasks[i], &temp);
-        switch_task(&tasks[posizione], &tasks[i]);
-        switch_task(&temp, &tasks[posizione]);
+        switch_task(&temp, &tasks[i]);
+        switch_task(&tasks[i], &tasks[posizione]);
+        switch_task(&tasks[posizione], &temp);
+
     }
 
 

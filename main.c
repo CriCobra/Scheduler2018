@@ -12,7 +12,7 @@ const char* program_name;
 
 
 int main(int argc, char *argv[]) {
-    Task *tasks = NULL;
+   Task *tasks = NULL;
     Istruzione *instructions = NULL;
      parametri(argc, argv);
     int n_task = parse(input, &tasks, &instructions);
@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
 
 
     //The pid_t data type represents process IDs
-       pid_t scheduler_preemptive, scheduler_notpreemptive;
+     pid_t scheduler_preemptive, scheduler_notpreemptive;
 
        if ((scheduler_preemptive = fork()) != 0) {
            if ((scheduler_notpreemptive = fork()) != 0) {
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 
            } else  {
                //sono nel not preemptive
-               start_sched(tasks, instructions, n_task, outputNoPreemption, 'N');
+              start_sched(tasks, instructions, n_task, outputNoPreemption, 'N');
 
 
 
@@ -44,8 +44,7 @@ int main(int argc, char *argv[]) {
 
            //sono nel preemptive
 
-
-           start_sched(tasks, instructions, n_task, outputPreemption, 'P');
+       //   start_sched(tasks, instructions, n_task, outputPreemption, 'P');
 
 
 
@@ -60,6 +59,7 @@ int main(int argc, char *argv[]) {
 
 
     return 0;
+
 }
 
 
